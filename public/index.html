@@ -1,0 +1,33 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Red Social Node</title>
+    <style>
+        body { font-family: Arial; background: #f4f4f4; padding: 20px; max-width: 600px; margin: auto; }
+        input, select, textarea, button { margin: 5px 0; width: 100%; padding: 8px; }
+        button { cursor: pointer; }
+        .post { background: white; padding: 10px; margin-top: 10px; border-radius: 5px; }
+        .post strong { display: block; }
+    </style>
+</head>
+<body>
+
+<h1>hablemos un rato pal aburrimiento</h1>
+
+<h2>Crear Usuario</h2>
+<input id="usuarioNuevo" placeholder="Nombre de usuario">
+<button onclick="crearUsuario()">Crear Usuario</button>
+
+<h2>Publicar Mensaje</h2>
+<select id="autor"></select>
+<textarea id="mensaje" placeholder="Mensaje"></textarea>
+<button onclick="crearPost()">Publicar</button>
+
+<h2>Publicaciones</h2>
+<div id="posts"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
