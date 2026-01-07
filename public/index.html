@@ -1,32 +1,49 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Red Social Node</title>
-    <style>
-        body { font-family: Arial; background: #f4f4f4; padding: 20px; max-width: 600px; margin: auto; }
-        input, select, textarea, button { margin: 5px 0; width: 100%; padding: 8px; }
-        button { cursor: pointer; }
-        .post { background: white; padding: 10px; margin-top: 10px; border-radius: 5px; }
-        .post strong { display: block; }
-    </style>
+
+    <!-- BOOTSTRAP CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
 </head>
-<body>
+<body class="bg-light">
 
-<h1>hablemos un rato pal aburrimiento</h1>
+<div class="container mt-4">
 
-<h2>Crear Usuario</h2>
-<input id="usuarioNuevo" placeholder="Nombre de usuario">
-<button onclick="crearUsuario()">Crear Usuario</button>
+    <h1 class="text-center mb-4">🌐 Red social de michell</h1>
 
-<h2>Publicar Mensaje</h2>
-<select id="autor"></select>
-<textarea id="mensaje" placeholder="Mensaje"></textarea>
-<button onclick="crearPost()">Publicar</button>
+    <!-- CREAR USUARIO -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Crear usuario</h5>
+            <input id="usuarioNuevo" class="form-control mb-2" placeholder="Nombre de usuario">
+            <button class="btn btn-primary w-100" onclick="crearUsuario()">Crear usuario</button>
+        </div>
+    </div>
 
-<h2>Publicaciones</h2>
-<div id="posts"></div>
+    <!-- PUBLICAR MENSAJE -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Publicar mensaje</h5>
+
+            <select id="autor" class="form-select mb-2"></select>
+
+            <textarea id="mensaje" class="form-control mb-2" placeholder="Escribe tu mensaje"></textarea>
+
+            <button class="btn btn-success w-100" onclick="crearPost()">Publicar</button>
+        </div>
+    </div>
+
+    <!-- POSTS -->
+    <h4>Publicaciones</h4>
+    <div id="posts"></div>
+
+</div>
+
+<!-- BOOTSTRAP JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script src="script.js"></script>
 </body>

@@ -1,10 +1,6 @@
-// Crear usuario
 async function crearUsuario() {
     const nombre = document.getElementById("usuarioNuevo").value.trim();
-    if (!nombre) {
-        alert("Ingresa un nombre válido");
-        return;
-    }
+    if (!nombre) return alert("Ingresa un nombre válido");
 
     const res = await fetch("/usuarios", {
         method: "POST",
@@ -13,26 +9,17 @@ async function crearUsuario() {
     });
 
     const data = await res.json();
+    if (!res.ok) return alert(data.error);
 
-    if (!res.ok) {
-        alert(data.error);
-        return;
-    }
-
-    alert("Usuario creado ✅");
     document.getElementById("usuarioNuevo").value = "";
     cargarUsuarios();
 }
 
-// Crear post
 async function crearPost() {
     const usuario = document.getElementById("autor").value;
     const contenido = document.getElementById("mensaje").value.trim();
 
-    if (!contenido) {
-        alert("El mensaje no puede estar vacío");
-        return;
-    }
+    if (!contenido) return alert("El mensaje no puede estar vacío");
 
     const res = await fetch("/posts", {
         method: "POST",
@@ -41,23 +28,19 @@ async function crearPost() {
     });
 
     const data = await res.json();
-
-    if (!res.ok) {
-        alert(data.error);
-        return;
-    }
+    if (!res.ok) return alert(data.error);
 
     document.getElementById("mensaje").value = "";
     cargarPosts();
 }
 
-// Cargar usuarios en el select
 async function cargarUsuarios() {
     const res = await fetch("/usuarios");
     const usuarios = await res.json();
 
     const select = document.getElementById("autor");
     select.innerHTML = "";
+
     usuarios.forEach(u => {
         const option = document.createElement("option");
         option.value = u.nombre;
@@ -66,7 +49,6 @@ async function cargarUsuarios() {
     });
 }
 
-// Cargar posts
 async function cargarPosts() {
     const res = await fetch("/posts");
     const posts = await res.json();
@@ -76,15 +58,16 @@ async function cargarPosts() {
 
     posts.forEach(p => {
         contenedor.innerHTML += `
-            <div class="post">
-                <strong>${p.usuario}</strong>
-                <p>${p.contenido}</p>
-                <small>${new Date(p.fecha).toLocaleString()}</small>
+            <div class="card mb-2">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-1 text-muted">${p.usuario}</h6>
+                    <p class="card-text">${p.contenido}</p>
+                    <small class="text-muted">${new Date(p.fecha).toLocaleString()}</small>
+                </div>
             </div>
         `;
     });
 }
 
-// Inicializar
 cargarUsuarios();
 cargarPosts();
