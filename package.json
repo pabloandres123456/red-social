@@ -1,5 +1,23 @@
 {
   "dependencies": {
     "express": "^5.2.1"
-  }
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "name": "facebook",
+  "version": "1.0.0",
+  "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pabloandres123456/red-social.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pabloandres123456/red-social/issues"
+  },
+  "homepage": "https://github.com/pabloandres123456/red-social#readme",
+  "description": ""
 }

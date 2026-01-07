@@ -1,73 +1,81 @@
-async function crearUsuario() {
-    const nombre = document.getElementById("usuarioNuevo").value.trim();
-    if (!nombre) return alert("Ingresa un nombre válido");
+let usuarioActual = null;
+let usuarioChat = null;
 
-    const res = await fetch("/usuarios", {
+// Función de login
+async function login() {
+    const nombre = document.getElementById("loginNombre").value.trim();
+    if (!nombre) return alert("Ingresa un nombre");
+
+    const res = await fetch("/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nombre })
     });
+    const user = await res.json();
+    usuarioActual = user.nombre;
+    document.getElementById("usuarioActualLabel").textContent = usuarioActual;
 
-    const data = await res.json();
-    if (!res.ok) return alert(data.error);
-
-    document.getElementById("usuarioNuevo").value = "";
     cargarUsuarios();
 }
 
-async function crearPost() {
-    const usuario = document.getElementById("autor").value;
-    const contenido = document.getElementById("mensaje").value.trim();
-
-    if (!contenido) return alert("El mensaje no puede estar vacío");
-
-    const res = await fetch("/posts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ usuario, contenido })
-    });
-
-    const data = await res.json();
-    if (!res.ok) return alert(data.error);
-
-    document.getElementById("mensaje").value = "";
-    cargarPosts();
-}
-
+// Función para cargar usuarios
 async function cargarUsuarios() {
-    const res = await fetch("/usuarios");
+    if (!usuarioActual) return;
+    const res = await fetch(`/usuarios/${usuarioActual}`);
     const usuarios = await res.json();
 
-    const select = document.getElementById("autor");
-    select.innerHTML = "";
-
+    const lista = document.getElementById("listaUsuarios");
+    lista.innerHTML = "";
     usuarios.forEach(u => {
-        const option = document.createElement("option");
-        option.value = u.nombre;
-        option.textContent = u.nombre;
-        select.appendChild(option);
+        const li = document.createElement("li");
+        li.className = "list-group-item list-group-item-action";
+        li.textContent = u.nombre;
+        li.onclick = () => seleccionarUsuario(u.nombre);
+        lista.appendChild(li);
     });
 }
 
-async function cargarPosts() {
-    const res = await fetch("/posts");
-    const posts = await res.json();
+// Función para seleccionar un usuario y cargar el chat
+function seleccionarUsuario(nombre) {
+    usuarioChat = nombre;
+    document.getElementById("chatTitulo").textContent = "Chat con " + nombre;
+    cargarChat();
+}
 
-    const contenedor = document.getElementById("posts");
-    contenedor.innerHTML = "";
+// Función para cargar el chat entre los dos usuarios
+async function cargarChat() {
+    if (!usuarioActual || !usuarioChat) return;
+    const res = await fetch(`/chats/${usuarioActual}/${usuarioChat}`);
+    const mensajes = await res.json();
 
-    posts.forEach(p => {
-        contenedor.innerHTML += `
-            <div class="card mb-2">
-                <div class="card-body">
-                    <h6 class="card-subtitle mb-1 text-muted">${p.usuario}</h6>
-                    <p class="card-text">${p.contenido}</p>
-                    <small class="text-muted">${new Date(p.fecha).toLocaleString()}</small>
-                </div>
+    const chat = document.getElementById("chat");
+    chat.innerHTML = "";
+    mensajes.forEach(m => {
+        chat.innerHTML += `
+            <div class="${m.emisor === usuarioActual ? "text-end" : ""}">
+                <span class="badge bg-${m.emisor === usuarioActual ? "success" : "secondary"}">
+                    ${m.mensaje}
+                </span>
             </div>
         `;
     });
 }
 
-cargarUsuarios();
-cargarPosts();
+// Función para enviar un mensaje
+async function enviarMensaje() {
+    const mensaje = document.getElementById("mensaje").value.trim();
+    if (!mensaje || !usuarioChat || !usuarioActual) return;
+
+    await fetch("/chats", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            emisor: usuarioActual,
+            receptor: usuarioChat,
+            mensaje
+        })
+    });
+
+    document.getElementById("mensaje").value = "";
+    cargarChat();
+}

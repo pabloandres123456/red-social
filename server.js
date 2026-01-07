@@ -1,65 +1,57 @@
 const express = require("express");
 const path = require("path");
-
-const { agregarUsuario, obtenerUsuarios, agregarPost, obtenerPosts } = require("./services/storage");
 const User = require("./models/User");
-const Post = require("./models/Post");
+const Chat = require("./models/Chat");
+const { agregarUsuario, obtenerUsuarios, agregarChat, obtenerChats } = require("./services/storage");
 
 const app = express();
 app.use(express.json());
 app.use(express.static("public"));
 
-/* RUTAS */
-
-// Crear usuario
-app.post("/usuarios", (req, res) => {
+// Ruta para registrar o iniciar sesión con un nombre de usuario
+app.post("/login", (req, res) => {
     const { nombre } = req.body;
-
     if (!nombre) return res.status(400).json({ error: "Nombre requerido" });
 
-    const existe = obtenerUsuarios().some(u => u.nombre === nombre);
-    if (existe) return res.status(400).json({ error: "Usuario ya existe" });
+    let usuarios = obtenerUsuarios();
+    let usuario = usuarios.find(u => u.nombre === nombre);
 
-    const user = new User(nombre);
-    agregarUsuario(user);
+    if (!usuario) {
+        // Crear un nuevo usuario si no existe
+        usuario = new User(nombre);
+        agregarUsuario(usuario);
+    }
 
-    res.json(user);
+    res.json(usuario);
 });
 
-// Obtener usuarios
-app.get("/usuarios", (req, res) => {
-    res.json(obtenerUsuarios());
+// Ruta para obtener todos los usuarios (excepto el usuario actual)
+app.get("/usuarios/:actual", (req, res) => {
+    const actual = req.params.actual;
+    const usuarios = obtenerUsuarios().filter(u => u.nombre !== actual);
+    res.json(usuarios);
 });
 
-app.post("/posts", (req, res) => {
-    const { usuario, contenido } = req.body;
-
-    // Validar datos
-    if (!usuario || !contenido) {
+// Ruta para enviar un mensaje de chat
+app.post("/chats", (req, res) => {
+    const { emisor, receptor, mensaje } = req.body;
+    if (!emisor || !receptor || !mensaje)
         return res.status(400).json({ error: "Datos incompletos" });
-    }
 
-    // Validar que el usuario exista
-    const existeUsuario = obtenerUsuarios().some(u => u.nombre === usuario);
-    if (!existeUsuario) {
-        return res.status(400).json({
-            error: "El usuario no existe. Debes crear el usuario primero."
-        });
-    }
+    const usuarios = obtenerUsuarios();
+    if (!usuarios.find(u => u.nombre === emisor) || !usuarios.find(u => u.nombre === receptor))
+        return res.status(400).json({ error: "Usuario no válido" });
 
-    // Crear y agregar el post
-    const post = new Post(usuario, contenido);
-    agregarPost(post);
-
-    res.json(post);
+    const chat = new Chat(emisor, receptor, mensaje);
+    agregarChat(chat);
+    res.json(chat);
 });
 
-
-// Obtener posts
-app.get("/posts", (req, res) => {
-    res.json(obtenerPosts());
+// Ruta para obtener los mensajes entre dos usuarios
+app.get("/chats/:u1/:u2", (req, res) => {
+    const { u1, u2 } = req.params;
+    res.json(obtenerChats(u1, u2));
 });
 
-app.listen(3000, () => {
-    console.log("🔥 Servidor corriendo en http://localhost:3000");
-});
+// Iniciar servidor
+app.listen(3000, () => console.log("🔥 Servidor corriendo en http://localhost:3000"));
