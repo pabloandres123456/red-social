@@ -1,34 +1,73 @@
+/* ===============================
+   ESTADO GLOBAL
+================================ */
 let usuarioActual = null;
 let usuarioChat = null;
+let usuariosCache = [];
+let fotoSeleccionada = false;
 
-// Vista previa de foto
-document.getElementById("fileCamera").addEventListener("change", e => {
-    const file = e.target.files[0];
-    if (!file) return;
+/* ===============================
+   ELEMENTOS DOM
+================================ */
+const loginView = document.getElementById("loginView");
+const chatView = document.getElementById("chatView");
+
+const inputNombre = document.getElementById("loginNombre");
+const inputFoto = document.getElementById("fileCamera");
+const previewImg = document.getElementById("previewImg");
+const btnEntrar = document.getElementById("btnEntrar");
+
+const miAvatar = document.getElementById("miAvatar");
+const usuarioLabel = document.getElementById("usuarioActualLabel");
+
+const listaUsuarios = document.getElementById("listaUsuarios");
+const chatPanel = document.querySelector(".chat-panel");
+const usersPanel = document.querySelector(".users-panel");
+
+const chatTitulo = document.getElementById("chatTitulo");
+const chatAvatar = document.getElementById("chatAvatar");
+const chatEstado = document.getElementById("chatEstado");
+const chatBody = document.getElementById("chat");
+const inputMensaje = document.getElementById("mensaje");
+
+/* ===============================
+   LOGIN / REGISTRO
+================================ */
+
+// Foto preview + validación
+inputFoto.addEventListener("change", () => {
+    const file = inputFoto.files[0];
+    if (!file || !file.type.startsWith("image/")) return;
 
     const reader = new FileReader();
     reader.onload = () => {
-        document.getElementById("previewImg").src = reader.result;
+        previewImg.src = reader.result;
+        document.querySelector(".profile-container").style.backgroundImage = "none";
+        fotoSeleccionada = true;
+        validarLogin();
     };
     reader.readAsDataURL(file);
 });
 
-async function login() {
-    const nombre = document.getElementById("loginNombre").value.trim();
-    const fotoInput = document.getElementById("fileCamera");
-    const foto = fotoInput.files[0];
+// Validar nombre
+inputNombre.addEventListener("input", validarLogin);
 
-    if (!nombre) return alert("Ingresa un nombre");
+function validarLogin() {
+    btnEntrar.disabled = !(inputNombre.value.trim() && fotoSeleccionada);
+}
+
+// Login
+async function login() {
+    const nombre = inputNombre.value.trim();
+    const foto = inputFoto.files[0];
+
+    if (!nombre || !foto) return;
 
     const formData = new FormData();
     formData.append("nombre", nombre);
-    if (foto) formData.append("foto", foto);
+    formData.append("foto", foto);
 
-    let res = await fetch("/usuarios", {
-        method: "POST",
-        body: formData
-    });
-
+    let res = await fetch("/usuarios", { method: "POST", body: formData });
     let usuario;
 
     if (!res.ok) {
@@ -37,27 +76,29 @@ async function login() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ nombre })
         });
-        usuario = await res.json();
-    } else {
-        usuario = await res.json();
     }
 
-    usuarioActual = usuario.nombre;
-    document.getElementById("usuarioActualLabel").textContent = usuarioActual;
+    usuario = await res.json();
 
-    // Cambiar de vista
-    document.getElementById("loginView").style.display = "none";
-    document.getElementById("chatView").style.display = "block";
+    usuarioActual = usuario.nombre;
+    miAvatar.src = usuario.foto;
+    usuarioLabel.textContent = usuarioActual;
+
+    loginView.style.display = "none";
+    chatView.style.display = "block";
 
     cargarUsuarios();
 }
+
+/* ===============================
+   USUARIOS
+================================ */
 
 async function cargarUsuarios() {
     const res = await fetch("/usuarios");
     usuariosCache = await res.json();
 
-    const lista = document.getElementById("listaUsuarios");
-    lista.innerHTML = "";
+    listaUsuarios.innerHTML = "";
 
     usuariosCache.forEach(u => {
         if (u.nombre === usuarioActual) return;
@@ -66,109 +107,59 @@ async function cargarUsuarios() {
         li.className = "list-group-item list-group-item-action";
 
         li.innerHTML = `
-            <div class="user-item">
-                <img src="${u.foto || 'https://via.placeholder.com/42'}" class="user-avatar">
+            <div class="d-flex align-items-center gap-2">
+                <img src="${u.foto}" class="user-avatar">
                 <span>${u.nombre}</span>
             </div>
         `;
 
-        li.onclick = () => seleccionarUsuario(u.nombre);
-        lista.appendChild(li);
+        li.onclick = () => abrirChat(u);
+        listaUsuarios.appendChild(li);
     });
 }
 
-function seleccionarUsuario(nombre) {
-    usuarioChat = nombre;
+function abrirChat(usuario) {
+    usuarioChat = usuario.nombre;
 
-    const usuario = usuariosCache.find(u => u.nombre === nombre);
+    chatTitulo.textContent = usuario.nombre;
+    chatAvatar.src = usuario.foto;
+    chatAvatar.style.display = "block";
+    chatEstado.textContent = "En línea";
 
-    document.getElementById("chatTitulo").textContent = nombre;
-    document.getElementById("chatAvatar").src =
-        usuario?.foto || "https://via.placeholder.com/40";
-    document.getElementById("chatAvatar").style.display = "block";
-    document.getElementById("chatEstado").textContent = "En línea";
-
-    // 📱 Móvil: mostrar solo chat
-    if (window.innerWidth <= 768) {
-        document.querySelector(".users-panel").classList.add("hidden");
-        document.querySelector(".chat-panel").classList.remove("hidden");
-    }
+    usersPanel.classList.add("hidden");
+    chatPanel.classList.remove("hidden");
 
     cargarChat();
 }
-function cerrarSesion() {
-    usuarioActual = null;
-    usuarioChat = null;
 
-    // Limpiar UI
-    document.getElementById("chat").innerHTML = "";
-    document.getElementById("listaUsuarios").innerHTML = "";
-    document.getElementById("chatTitulo").textContent = "Selecciona un usuario";
-    document.getElementById("chatAvatar").style.display = "none";
-    document.getElementById("chatEstado").textContent = "";
-    document.getElementById("mensaje").value = "";
-
-    // Volver a vista login
-    document.getElementById("chatView").style.display = "none";
-    document.getElementById("loginView").style.display = "block";
-
-    // Reset foto preview
-    document.getElementById("previewImg").src = "https://via.placeholder.com/130";
-    document.getElementById("loginNombre").value = "";
-
-    // Restaurar paneles (por si estaba en móvil)
-    document.querySelector(".users-panel")?.classList.remove("hidden");
-    document.querySelector(".chat-panel")?.classList.remove("hidden");
-}
-
-
-function volverUsuarios() {
-    usuarioChat = null;
-
-    document.getElementById("chatTitulo").textContent = "Selecciona un usuario";
-    document.getElementById("chatAvatar").style.display = "none";
-    document.getElementById("chatEstado").textContent = "";
-    document.getElementById("chat").innerHTML = "";
-
-    // 📱 SOLO en móvil: cambiar vistas
-    if (window.innerWidth <= 768) {
-        document.querySelector(".users-panel").classList.remove("hidden");
-        document.querySelector(".chat-panel").classList.add("hidden");
-    }
-}
-
+/* ===============================
+   CHAT
+================================ */
 
 async function cargarChat() {
     const res = await fetch(`/chats/${usuarioActual}/${usuarioChat}`);
     const mensajes = await res.json();
 
-    const usuariosRes = await fetch("/usuarios");
-    const usuarios = await usuariosRes.json();
-
-    const chat = document.getElementById("chat");
-    chat.innerHTML = "";
+    chatBody.innerHTML = "";
 
     mensajes.forEach(m => {
         const esMio = m.emisor === usuarioActual;
-        const user = usuarios.find(u => u.nombre === m.emisor);
+        const user = usuariosCache.find(u => u.nombre === m.emisor);
 
-        const avatar = user?.foto || "https://via.placeholder.com/32";
-
-        chat.innerHTML += `
+        chatBody.innerHTML += `
             <div class="message ${esMio ? "me" : "other"}">
-                ${!esMio ? `<img src="${avatar}" class="avatar">` : ""}
+                ${!esMio ? `<img src="${user.foto}" class="avatar">` : ""}
                 <div class="bubble">${m.mensaje}</div>
-                ${esMio ? `<img src="${avatar}" class="avatar">` : ""}
+                ${esMio ? `<img src="${user.foto}" class="avatar">` : ""}
             </div>
         `;
     });
 
-    chat.scrollTop = chat.scrollHeight;
+    chatBody.scrollTop = chatBody.scrollHeight;
 }
 
-
 async function enviarMensaje() {
-    const mensaje = document.getElementById("mensaje").value.trim();
+    const mensaje = inputMensaje.value.trim();
     if (!mensaje || !usuarioChat) return;
 
     await fetch("/chats", {
@@ -181,15 +172,36 @@ async function enviarMensaje() {
         })
     });
 
-    document.getElementById("mensaje").value = "";
+    inputMensaje.value = "";
     cargarChat();
 }
-window.addEventListener("beforeunload", () => {
-    if (usuarioActual) {
-        navigator.sendBeacon(
-            "/logout",
-            JSON.stringify({ nombre: usuarioActual })
-        );
-    }
-});
 
+/* ===============================
+   NAVEGACIÓN
+================================ */
+
+function volverUsuarios() {
+    usuarioChat = null;
+
+    chatTitulo.textContent = "Selecciona un usuario";
+    chatAvatar.style.display = "none";
+    chatEstado.textContent = "";
+    chatBody.innerHTML = "";
+
+    usersPanel.classList.remove("hidden");
+    chatPanel.classList.add("hidden");
+}
+
+function cerrarSesion() {
+    usuarioActual = null;
+    usuarioChat = null;
+
+    chatView.style.display = "none";
+    loginView.style.display = "flex";
+
+    inputNombre.value = "";
+    inputFoto.value = "";
+    previewImg.src = "/perfil-de-usuario.png";
+    btnEntrar.disabled = true;
+    fotoSeleccionada = false;
+}

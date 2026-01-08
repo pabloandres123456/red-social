@@ -8,6 +8,7 @@
 <style>
 body {
     background: linear-gradient(90deg, #0b0b10,#200b0b);
+    margin: 0;
 }
 
 /* LOGIN */
@@ -17,155 +18,170 @@ body {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    text-align: center;
-}
-#loginView > * {
     width: 100%;
-    max-width: 380px;
+}
+
+#loginView input {
+    max-width: 300px;
 }
 
 /* FOTO */
 .profile-container {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
+    width: 130px;
+    height: 130px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    background-image: url("/perfil-de-usuario.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
+
 .profile-pic {
     width: 130px;
     height: 130px;
     border-radius: 50%;
     overflow: hidden;
+    border: 3px solid #25D366;
     cursor: pointer;
     position: relative;
-    border: 3px solid #25D366;
 }
+
 .profile-pic img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
+
 .camera-icon {
     position: absolute;
-    bottom: 8px;
-    right: 8px;
-    background: rgba(0,0,0,.7);
-    color: white;
-    padding: 7px;
+    bottom: 6px;
+    right: 6px;
+    background: rgba(0,0,0,.6);
+    padding: 6px;
     border-radius: 50%;
 }
+
+/* LAYOUT */
+.whatsapp-layout {
+    display: flex;
+    height: 100vh;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 30%;
+    background: #111;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-header {
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #202c33;
+    color: white;
+}
+
+.sidebar-search {
+    padding: 8px;
+}
+
+#listaUsuarios {
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* CHAT */
+.chat-panel {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    background: #0b141a;
+}
+
+.chat-header {
+    height: 60px;
+    padding: 10px;
+    background: #202c33;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+}
+
+.chat-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.chat-body {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+}
+
+.chat-input {
+    display: flex;
+    gap: 8px;
+    padding: 10px;
+    background: #202c33;
+}
+
+/* MENSAJES */
 .message {
     display: flex;
-    align-items: flex-end;
     margin-bottom: 8px;
 }
 
 .message.me {
     justify-content: flex-end;
 }
-.chat-avatar {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid #25D366;
-}
-
-.message .avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-right: 6px;
-}
-
-.message.me .avatar {
-    margin-left: 6px;
-    margin-right: 0;
-}
 
 .message .bubble {
     padding: 8px 12px;
     border-radius: 12px;
     max-width: 70%;
-    font-size: 14px;
 }
 
 .message.me .bubble {
-    background-color: #25D366;
+    background: #25D366;
     color: white;
 }
 
 .message.other .bubble {
-    background-color: #e4e6eb;
+    background: #e4e6eb;
 }
 
-/* CHAT */
-.user-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    cursor: pointer;
-}
-.user-avatar {
-    width: 42px;
-    height: 42px;
+.avatar, .user-avatar, .chat-avatar {
     border-radius: 50%;
     object-fit: cover;
+}
+
+.avatar {
+    width: 32px;
+    height: 32px;
+}
+
+.user-avatar, .chat-avatar {
+    width: 42px;
+    height: 42px;
     border: 2px solid #25D366;
 }
-.estado {
-    font-weight: 500;
-}
-.estado.online {
-    color: #25D366;
-}
-.estado.offline {
-    color: gray;
-}
-/* Altura completa */
-.chat-layout {
-    height:50vh;
-    
+
+/* OCULTAR */
+.hidden {
+    display: none;
 }
 
-
-
-.chat-panel {
-    height: 60%;
-    width: 100%;
-    
-    
-}
-
-/* Chat scroll correcto */
-#chat {
-    height: calc(75vh - 130px);
-    overflow-y: auto;
-}
-
-
-.chat-header .btn-outline-danger {
-    font-size: 13px;
-    padding: 4px 10px;
-}
-/* Scroll SOLO para la lista de usuarios */
-#listaUsuarios {
-    max-height: calc(75vh - 60px); /* altura menos header */
-    overflow-y: auto;
-}
-
-/* Scroll bonito (opcional) */
-#listaUsuarios::-webkit-scrollbar {
-    width: 6px;
-}
-
-#listaUsuarios::-webkit-scrollbar-thumb {
-    background-color: rgba(37, 211, 102, 0.6);
-    border-radius: 10px;
-}
-
-#listaUsuarios::-webkit-scrollbar-track {
-    background: transparent;
+/* MÓVIL */
+@media (max-width: 768px) {
+    .sidebar, .chat-panel {
+        width: 100%;
+    }
 }
 
 
@@ -175,77 +191,77 @@ body {
 
 <body>
 
-<!-- 🟢 LOGIN / REGISTRO -->
+
+<!-- 🟢 LOGIN -->
 <div id="loginView" class="text-white text-center">
     <h2 class="mb-4">💬 CHANDY</h2>
 
     <div class="profile-container">
-        <label for="fileCamera" class="profile-pic">
-            <img id="previewImg" src="https://via.placeholder.com/130">
-            <span class="camera-icon">📷</span>
-        </label>
-        <input id="fileCamera" type="file" accept="image/*" hidden>
+    <label for="fileCamera" class="profile-pic">
+        <img id="previewImg" src="/perfil-de-usuario.png">
+        <span class="camera-icon">📷</span>
+    </label>
+    <input id="fileCamera" type="file" accept="image/*" hidden>
     </div>
 
+
+
     <input id="loginNombre" class="form-control mb-3" placeholder="Tu nombre">
-    <button class="btn btn-success w-100" onclick="login()">Entrar</button>
+    <button id="btnEntrar" class="btn btn-success w-10" onclick="login()" disabled>
+    Entrar
+</button>
+
+
 </div>
 
 <!-- 🔵 CHAT -->
 <div id="chatView" style="display:none;">
-    <div class="container mt-4">
-        <div class="row chat-layout ">
-    <div class="col-md-4 col-6 users-panel">
-        <div class="card h-100">
-            <div class="card-header">Usuarios</div>
+    <div class="whatsapp-layout">
+
+        <!-- 🟢 USUARIOS -->
+        <div class="sidebar users-panel">
+
+            <div class="sidebar-header">
+                <img id="miAvatar" class="user-avatar">
+                <span id="usuarioActualLabel"></span>
+            </div>
+
+            <div class="sidebar-search">
+                <input class="form-control form-control-sm" placeholder="Buscar">
+            </div>
+
             <ul class="list-group list-group-flush" id="listaUsuarios"></ul>
         </div>
-    </div>
 
-    <div class="col-md-8 col-6 chat-panel mt-2">
-        <div class="card h-100">
-                            <div class="card-header d-flex align-items-center justify-content-between chat-header">
-    <div class="d-flex align-items-center gap-2">
-        <button
-            class="btn btn-sm btn-outline-secondary"
-            onclick="volverUsuarios()">
-            ⬅
-        </button>
+        <!-- 🔵 CHAT -->
+        <div class="chat-panel hidden">
 
-        <img id="chatAvatar" class="chat-avatar" style="display:none;">
+            <div class="chat-header">
+                <div class="chat-header-left">
+                    <button class="btn btn-sm btn-outline-secondary" onclick="volverUsuarios()">⬅</button>
+                    <img id="chatAvatar" class="chat-avatar" style="display:none">
+                    <div>
+                        <div id="chatTitulo">Selecciona un usuario</div>
+                        <small id="chatEstado"></small>
+                    </div>
+                </div>
 
-        <div>
-            <div id="chatTitulo">Selecciona un usuario</div>
-            <small id="chatEstado" class="text-muted"></small>
-        </div>
-    </div>
+                <button class="btn btn-sm btn-outline-danger" onclick="cerrarSesion()">Salir</button>
+            </div>
 
-    <button
-        class="btn btn-sm btn-outline-danger"
-        onclick="cerrarSesion()">
-        Salir
-    </button>
-</div>
+            <div class="chat-body" id="chat"></div>
 
-
-            <div class="card-body" id="chat"></div>
-
-            <div class="card-footer d-flex">
-                <input id="mensaje" class="form-control me-2" placeholder="Escribe un mensaje">
+            <div class="chat-input">
+                <input id="mensaje" class="form-control" placeholder="Escribe un mensaje">
                 <button class="btn btn-success" onclick="enviarMensaje()">Enviar</button>
             </div>
+
         </div>
     </div>
 </div>
 
-
-        <p class="text-muted mt-2">
-           <h6 style="font-family: Georgia, 'Times New Roman', Times, serif;" class="text-danger">con quien deseas hablar hoy</h6> <strong id="usuarioActualLabel" class="text-white"></strong>
-        </p>
-    </div>
-</div>
-
-
 <script src="script.js"></script>
+
+
 </body>
 </html>
