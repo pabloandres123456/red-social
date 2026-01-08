@@ -179,6 +179,26 @@ body {
     font-size: 13px;
     padding: 4px 10px;
 }
+/* Scroll SOLO para la lista de usuarios */
+#listaUsuarios {
+    max-height: calc(75vh - 60px); /* altura menos header */
+    overflow-y: auto;
+}
+
+/* Scroll bonito (opcional) */
+#listaUsuarios::-webkit-scrollbar {
+    width: 6px;
+}
+
+#listaUsuarios::-webkit-scrollbar-thumb {
+    background-color: rgba(37, 211, 102, 0.6);
+    border-radius: 10px;
+}
+
+#listaUsuarios::-webkit-scrollbar-track {
+    background: transparent;
+}
+
 
 
 </style>
