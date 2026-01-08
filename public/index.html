@@ -117,7 +117,7 @@ body {
 }
 /* Altura completa */
 .chat-layout {
-    height: 75vh;
+    height:50vh;
 }
 
 .users-panel,
@@ -131,49 +131,6 @@ body {
     overflow-y: auto;
 }
 
-/* 📱 MODO MÓVIL: lado a lado */
-@media (max-width: 268px) {
-    .chat-layout {
-        flex-wrap: nowrap;
-    }
-
-    .users-panel {
-        width:50%;
-        padding-right: 4px;
-    }
-
-    .chat-panel {
-        width:100%;
-        padding-left: 4px;
-    }
-
-    .card-header {
-        font-size: 14px;
-    }
-
-    .user-avatar {
-        width: 32px;
-        height: 32px;
-    }
-
-    .chat-avatar {
-        width: 32px;
-        height: 32px;
-    }
-
-    #mensaje {
-        font-size: 14px;
-    }
-}
-@media (max-width: 268px) {
-    .users-panel.hidden {
-        display: none;
-    }
-
-    .chat-panel.hidden {
-        display: none;
-    }
-}
 
 .chat-header .btn-outline-danger {
     font-size: 13px;
