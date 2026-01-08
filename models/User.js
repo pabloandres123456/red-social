@@ -1,9 +1,9 @@
 class User {
-    constructor(nombre) {
+    constructor(nombre, foto = null) {
         this.nombre = nombre;
-        this.creadoEn = new Date();
+        this.foto = foto;
+        this.online = false;
     }
 }
 
 module.exports = User;
-

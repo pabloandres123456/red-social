@@ -2,43 +2,260 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Chat WhatsApp</title>
+<title>CHANDY</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body {
+    background: linear-gradient(90deg, #0b0b10,#200b0b);
+}
+
+/* LOGIN */
+#loginView {
+    max-width: 400px;
+    margin: auto;
+    margin-top: 60px;
+}
+
+/* FOTO */
+.profile-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+.profile-pic {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    overflow: hidden;
+    cursor: pointer;
+    position: relative;
+    border: 3px solid #25D366;
+}
+.profile-pic img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.camera-icon {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background: rgba(0,0,0,.7);
+    color: white;
+    padding: 7px;
+    border-radius: 50%;
+}
+.message {
+    display: flex;
+    align-items: flex-end;
+    margin-bottom: 8px;
+}
+
+.message.me {
+    justify-content: flex-end;
+}
+.chat-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #25D366;
+}
+
+.message .avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 6px;
+}
+
+.message.me .avatar {
+    margin-left: 6px;
+    margin-right: 0;
+}
+
+.message .bubble {
+    padding: 8px 12px;
+    border-radius: 12px;
+    max-width: 70%;
+    font-size: 14px;
+}
+
+.message.me .bubble {
+    background-color: #25D366;
+    color: white;
+}
+
+.message.other .bubble {
+    background-color: #e4e6eb;
+}
+
+/* CHAT */
+.user-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+.user-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #25D366;
+}
+.estado {
+    font-weight: 500;
+}
+.estado.online {
+    color: #25D366;
+}
+.estado.offline {
+    color: gray;
+}
+/* Altura completa */
+.chat-layout {
+    height: 75vh;
+}
+
+.users-panel,
+.chat-panel {
+    height: 100%;
+}
+
+/* Chat scroll correcto */
+#chat {
+    height: calc(75vh - 130px);
+    overflow-y: auto;
+}
+
+/* 📱 MODO MÓVIL: lado a lado */
+@media (max-width: 768px) {
+    .chat-layout {
+        flex-wrap: nowrap;
+    }
+
+    .users-panel {
+        width: 45%;
+        padding-right: 4px;
+    }
+
+    .chat-panel {
+        width: 55%;
+        padding-left: 4px;
+    }
+
+    .card-header {
+        font-size: 14px;
+    }
+
+    .user-avatar {
+        width: 32px;
+        height: 32px;
+    }
+
+    .chat-avatar {
+        width: 32px;
+        height: 32px;
+    }
+
+    #mensaje {
+        font-size: 14px;
+    }
+}
+@media (max-width: 768px) {
+    .users-panel.hidden {
+        display: none;
+    }
+
+    .chat-panel.hidden {
+        display: none;
+    }
+}
+
+.chat-header .btn-outline-danger {
+    font-size: 13px;
+    padding: 4px 10px;
+}
+
+
+</style>
 </head>
-<body class="bg-light">
 
-<div class="container mt-4">
-    <h2 class="text-center mb-3">💬 Chat WhatsApp</h2>
+<body>
 
-    <div class="mb-3">
-        <input id="loginNombre" class="form-control mb-2" placeholder="Tu nombre">
-        <button class="btn btn-primary w-100" onclick="login()">Login / Registrar</button>
+<!-- 🟢 LOGIN / REGISTRO -->
+<div id="loginView" class="text-white text-center">
+    <h2 class="mb-4">💬 CHANDY</h2>
+
+    <div class="profile-container">
+        <label for="fileCamera" class="profile-pic">
+            <img id="previewImg" src="https://via.placeholder.com/130">
+            <span class="camera-icon">📷</span>
+        </label>
+        <input id="fileCamera" type="file" accept="image/*" hidden>
     </div>
 
-    <div id="chatApp" style="display:none;">
-        <div class="row">
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-header">Usuarios</div>
-                    <ul class="list-group list-group-flush" id="listaUsuarios"></ul>
-                </div>
-            </div>
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-header" id="chatTitulo">Selecciona un usuario</div>
-                    <div class="card-body" id="chat" style="height:300px; overflow-y:auto;"></div>
-                    <div class="card-footer d-flex">
-                        <input id="mensaje" class="form-control me-2" placeholder="Escribe un mensaje">
-                        <button class="btn btn-success" onclick="enviarMensaje()">Enviar</button>
-                    </div>
-                </div>
+    <input id="loginNombre" class="form-control mb-3" placeholder="Tu nombre">
+    <button class="btn btn-success w-100" onclick="login()">Entrar</button>
+</div>
+
+<!-- 🔵 CHAT -->
+<div id="chatView" style="display:none;">
+    <div class="container mt-4">
+        <div class="row chat-layout">
+    <div class="col-md-4 col-6 users-panel">
+        <div class="card h-100">
+            <div class="card-header">Usuarios</div>
+            <ul class="list-group list-group-flush" id="listaUsuarios"></ul>
+        </div>
+    </div>
+
+    <div class="col-md-8 col-6 chat-panel">
+        <div class="card h-100">
+                            <div class="card-header d-flex align-items-center justify-content-between chat-header">
+    <div class="d-flex align-items-center gap-2">
+        <button
+            class="btn btn-sm btn-outline-secondary"
+            onclick="volverUsuarios()">
+            ⬅
+        </button>
+
+        <img id="chatAvatar" class="chat-avatar" style="display:none;">
+
+        <div>
+            <div id="chatTitulo">Selecciona un usuario</div>
+            <small id="chatEstado" class="text-muted"></small>
+        </div>
+    </div>
+
+    <button
+        class="btn btn-sm btn-outline-danger"
+        onclick="cerrarSesion()">
+        Salir
+    </button>
+</div>
+
+
+            <div class="card-body" id="chat"></div>
+
+            <div class="card-footer d-flex">
+                <input id="mensaje" class="form-control me-2" placeholder="Escribe un mensaje">
+                <button class="btn btn-success" onclick="enviarMensaje()">Enviar</button>
             </div>
         </div>
+    </div>
+</div>
+
+
         <p class="text-muted mt-2">
-            Usuario logeado: <strong id="usuarioActualLabel"></strong>
+           <h6 style="font-family: Georgia, 'Times New Roman', Times, serif;" class="text-danger">con quien deseas hablar hoy</h6> <strong id="usuarioActualLabel" class="text-white"></strong>
         </p>
     </div>
 </div>
+
 
 <script src="script.js"></script>
 </body>
